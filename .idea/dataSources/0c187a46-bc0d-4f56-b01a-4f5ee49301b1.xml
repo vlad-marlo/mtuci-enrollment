@@ -3,15 +3,7 @@
   <database-model serializer="dbm" dbms="POSTGRES" family-id="POSTGRES" format-version="4.51">
     <root id="1">
       <DateStyle>dmy</DateStyle>
-      <Grants>1||-9223372036854775808|c|G
-1||10|c|G
-1||10|C|G
-1||10|T|G
-4||-9223372036854775808|c|G
-4||10|c|G
-4||10|C|G
-4||10|T|G
-202868||-9223372036854775808|c|G
+      <Grants>202868||-9223372036854775808|c|G
 202868||10|c|G
 202868||202867|c|G
 202868||10|C|G
@@ -19,7 +11,7 @@
 202868||-9223372036854775808|T|G
 202868||10|T|G
 202868||202867|T|G</Grants>
-      <IntrospectionStateNumber>24921</IntrospectionStateNumber>
+      <IntrospectionStateNumber>24923</IntrospectionStateNumber>
       <ServerVersion>15.5</ServerVersion>
       <StartupTime>1706271135</StartupTime>
       <TimeZones>true ACDT
@@ -1422,7 +1414,7 @@ false posixrules
 14208||10|C|G
 14208||-9223372036854775808|U|G
 14208||10|U|G</Grants>
-      <IntrospectionStateNumber>24921</IntrospectionStateNumber>
+      <IntrospectionStateNumber>24923</IntrospectionStateNumber>
       <ObjectId>252906</ObjectId>
       <OwnerName>marlo</OwnerName>
     </database>
@@ -4889,8 +4881,8 @@ false posixrules
     <schema id="276" parent="4" name="public">
       <Comment>standard public schema</Comment>
       <Current>1</Current>
-      <IntrospectionStateNumber>24921</IntrospectionStateNumber>
-      <LastIntrospectionLocalTimestamp>2024-01-26.18:51:05</LastIntrospectionLocalTimestamp>
+      <IntrospectionStateNumber>24923</IntrospectionStateNumber>
+      <LastIntrospectionLocalTimestamp>2024-01-26.18:53:31</LastIntrospectionLocalTimestamp>
       <ObjectId>2200</ObjectId>
       <StateNumber>517</StateNumber>
       <OwnerName>pg_database_owner</OwnerName>
@@ -4903,7 +4895,15 @@ false posixrules
       <StateNumber>24920</StateNumber>
       <OwnerName>postgres</OwnerName>
     </sequence>
-    <sequence id="278" parent="276" name="users_id_seq">
+    <sequence id="278" parent="276" name="revisions_id_seq">
+      <DasType>integer|0s</DasType>
+      <ObjectId>252937</ObjectId>
+      <SequenceIdentity>1</SequenceIdentity>
+      <StartValue>1</StartValue>
+      <StateNumber>24922</StateNumber>
+      <OwnerName>postgres</OwnerName>
+    </sequence>
+    <sequence id="279" parent="276" name="users_id_seq">
       <DasType>integer|0s</DasType>
       <ObjectId>252912</ObjectId>
       <SequenceIdentity>1</SequenceIdentity>
@@ -4911,32 +4911,38 @@ false posixrules
       <StateNumber>24919</StateNumber>
       <OwnerName>postgres</OwnerName>
     </sequence>
-    <table id="279" parent="276" name="alembic_version">
+    <table id="280" parent="276" name="alembic_version">
       <ObjectId>252907</ObjectId>
       <StateNumber>24919</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>postgres</OwnerName>
     </table>
-    <table id="280" parent="276" name="notes">
+    <table id="281" parent="276" name="notes">
       <ObjectId>252924</ObjectId>
       <StateNumber>24920</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>postgres</OwnerName>
     </table>
-    <table id="281" parent="276" name="users">
+    <table id="282" parent="276" name="revisions">
+      <ObjectId>252938</ObjectId>
+      <StateNumber>24922</StateNumber>
+      <AccessMethodId>2</AccessMethodId>
+      <OwnerName>postgres</OwnerName>
+    </table>
+    <table id="283" parent="276" name="users">
       <ObjectId>252913</ObjectId>
       <StateNumber>24920</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>postgres</OwnerName>
     </table>
-    <column id="282" parent="279" name="version_num">
+    <column id="284" parent="280" name="version_num">
       <DasType>varchar(32)|0s</DasType>
       <NotNull>1</NotNull>
       <Position>1</Position>
       <StateNumber>24919</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <index id="283" parent="279" name="alembic_version_pkc">
+    <index id="285" parent="280" name="alembic_version_pkc">
       <ColNames>version_num</ColNames>
       <ObjectId>252910</ObjectId>
       <Primary>1</Primary>
@@ -4947,13 +4953,13 @@ false posixrules
       <CollationIds>100</CollationIds>
       <CollationParentNames>pg_catalog</CollationParentNames>
     </index>
-    <key id="284" parent="279" name="alembic_version_pkc">
+    <key id="286" parent="280" name="alembic_version_pkc">
       <ObjectId>252911</ObjectId>
       <Primary>1</Primary>
       <StateNumber>24919</StateNumber>
       <UnderlyingIndexId>252910</UnderlyingIndexId>
     </key>
-    <column id="285" parent="280" name="id">
+    <column id="287" parent="281" name="id">
       <DasType>integer|0s</DasType>
       <DefaultExpression>nextval(&apos;notes_id_seq&apos;::regclass)</DefaultExpression>
       <NotNull>1</NotNull>
@@ -4962,28 +4968,28 @@ false posixrules
       <SequenceId>252923</SequenceId>
       <TypeId>23</TypeId>
     </column>
-    <column id="286" parent="280" name="text">
+    <column id="288" parent="281" name="text">
       <DasType>varchar|0s</DasType>
       <NotNull>1</NotNull>
       <Position>2</Position>
       <StateNumber>24920</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="287" parent="280" name="created_at">
+    <column id="289" parent="281" name="created_at">
       <DasType>timestamp|0s</DasType>
       <NotNull>1</NotNull>
       <Position>3</Position>
       <StateNumber>24920</StateNumber>
       <TypeId>1114</TypeId>
     </column>
-    <column id="288" parent="280" name="user_id">
+    <column id="290" parent="281" name="user_id">
       <DasType>integer|0s</DasType>
       <NotNull>1</NotNull>
       <Position>4</Position>
       <StateNumber>24920</StateNumber>
       <TypeId>23</TypeId>
     </column>
-    <foreign-key id="289" parent="280" name="notes_user_id_fkey">
+    <foreign-key id="291" parent="281" name="notes_user_id_fkey">
       <ColNames>user_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>252932</ObjectId>
@@ -4991,7 +4997,7 @@ false posixrules
       <RefKeyColPositions>1</RefKeyColPositions>
       <RefTableId>252913</RefTableId>
     </foreign-key>
-    <index id="290" parent="280" name="notes_pkey">
+    <index id="292" parent="281" name="notes_pkey">
       <ColNames>id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>252930</ObjectId>
@@ -5000,14 +5006,68 @@ false posixrules
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <key id="291" parent="280" name="notes_pkey">
+    <key id="293" parent="281" name="notes_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>252931</ObjectId>
       <Primary>1</Primary>
       <StateNumber>24920</StateNumber>
       <UnderlyingIndexId>252930</UnderlyingIndexId>
     </key>
-    <column id="292" parent="281" name="id">
+    <column id="294" parent="282" name="id">
+      <DasType>integer|0s</DasType>
+      <DefaultExpression>nextval(&apos;revisions_id_seq&apos;::regclass)</DefaultExpression>
+      <NotNull>1</NotNull>
+      <Position>1</Position>
+      <StateNumber>24922</StateNumber>
+      <SequenceId>252937</SequenceId>
+      <TypeId>23</TypeId>
+    </column>
+    <column id="295" parent="282" name="text">
+      <DasType>varchar|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>2</Position>
+      <StateNumber>24922</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="296" parent="282" name="created_at">
+      <DasType>timestamp|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>3</Position>
+      <StateNumber>24922</StateNumber>
+      <TypeId>1114</TypeId>
+    </column>
+    <column id="297" parent="282" name="note_id">
+      <DasType>integer|0s</DasType>
+      <NotNull>1</NotNull>
+      <Position>4</Position>
+      <StateNumber>24922</StateNumber>
+      <TypeId>23</TypeId>
+    </column>
+    <foreign-key id="298" parent="282" name="revisions_note_id_fkey">
+      <ColNames>note_id</ColNames>
+      <NameSurrogate>1</NameSurrogate>
+      <ObjectId>252946</ObjectId>
+      <StateNumber>24922</StateNumber>
+      <RefKeyColPositions>1</RefKeyColPositions>
+      <RefTableId>252924</RefTableId>
+    </foreign-key>
+    <index id="299" parent="282" name="revisions_pkey">
+      <ColNames>id</ColNames>
+      <NameSurrogate>1</NameSurrogate>
+      <ObjectId>252944</ObjectId>
+      <Primary>1</Primary>
+      <StateNumber>24922</StateNumber>
+      <Unique>1</Unique>
+      <AccessMethodId>403</AccessMethodId>
+    </index>
+    <key id="300" parent="282" name="revisions_pkey">
+      <NameSurrogate>1</NameSurrogate>
+      <ObjectId>252945</ObjectId>
+      <Primary>1</Primary>
+      <StateNumber>24922</StateNumber>
+      <UnderlyingIndexId>252944</UnderlyingIndexId>
+    </key>
+    <column id="301" parent="283" name="id">
       <DasType>integer|0s</DasType>
       <DefaultExpression>nextval(&apos;users_id_seq&apos;::regclass)</DefaultExpression>
       <NotNull>1</NotNull>
@@ -5016,49 +5076,49 @@ false posixrules
       <SequenceId>252912</SequenceId>
       <TypeId>23</TypeId>
     </column>
-    <column id="293" parent="281" name="phone">
+    <column id="302" parent="283" name="phone">
       <DasType>varchar|0s</DasType>
       <NotNull>1</NotNull>
       <Position>2</Position>
       <StateNumber>24919</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="294" parent="281" name="first_name">
+    <column id="303" parent="283" name="first_name">
       <DasType>varchar|0s</DasType>
       <NotNull>1</NotNull>
       <Position>3</Position>
       <StateNumber>24919</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="295" parent="281" name="middle_name">
+    <column id="304" parent="283" name="middle_name">
       <DasType>varchar|0s</DasType>
       <NotNull>1</NotNull>
       <Position>4</Position>
       <StateNumber>24919</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="296" parent="281" name="last_name">
+    <column id="305" parent="283" name="last_name">
       <DasType>varchar|0s</DasType>
       <NotNull>1</NotNull>
       <Position>5</Position>
       <StateNumber>24919</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="297" parent="281" name="position">
+    <column id="306" parent="283" name="position">
       <DasType>varchar|0s</DasType>
       <NotNull>1</NotNull>
       <Position>6</Position>
       <StateNumber>24919</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="298" parent="281" name="can_check">
+    <column id="307" parent="283" name="can_check">
       <DasType>boolean|0s</DasType>
       <NotNull>1</NotNull>
       <Position>7</Position>
       <StateNumber>24919</StateNumber>
       <TypeId>16</TypeId>
     </column>
-    <index id="299" parent="281" name="users_pkey">
+    <index id="308" parent="283" name="users_pkey">
       <ColNames>id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>252919</ObjectId>
@@ -5067,7 +5127,7 @@ false posixrules
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <index id="300" parent="281" name="users_phone_key">
+    <index id="309" parent="283" name="users_phone_key">
       <ColNames>phone</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>252921</ObjectId>
@@ -5078,14 +5138,14 @@ false posixrules
       <CollationIds>100</CollationIds>
       <CollationParentNames>pg_catalog</CollationParentNames>
     </index>
-    <key id="301" parent="281" name="users_pkey">
+    <key id="310" parent="283" name="users_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>252920</ObjectId>
       <Primary>1</Primary>
       <StateNumber>24919</StateNumber>
       <UnderlyingIndexId>252919</UnderlyingIndexId>
     </key>
-    <key id="302" parent="281" name="users_phone_key">
+    <key id="311" parent="283" name="users_phone_key">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>252922</ObjectId>
       <StateNumber>24919</StateNumber>
