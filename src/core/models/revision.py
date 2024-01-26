@@ -8,8 +8,6 @@ from .database import Base
 
 class Revision(Base):
     __tablename__ = "revisions"
-    _user_back_populates = "revision"
-
     id: Mapped[int] = mapped_column(primary_key=True)
     text: Mapped[str]
     created_at: Mapped[datetime] = mapped_column(
