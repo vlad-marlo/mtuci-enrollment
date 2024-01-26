@@ -4,10 +4,9 @@ from sqlalchemy import ForeignKey, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from .database import Base
-from .mixins import UserMixin
 
 
-class Revision(Base, UserMixin):
+class Revision(Base):
     __tablename__ = "revisions"
     _user_back_populates = "revision"
 
