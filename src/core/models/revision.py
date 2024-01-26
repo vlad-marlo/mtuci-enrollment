@@ -17,3 +17,8 @@ class Revision(Base):
         ForeignKey("notes.id"),
         nullable=False,
     )
+    created_by: Mapped[int] = mapped_column(
+        ForeignKey("users.id"),
+        nullable=False,
+    )
+    passed: Mapped[bool]
