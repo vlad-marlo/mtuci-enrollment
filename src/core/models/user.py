@@ -19,7 +19,7 @@ class User(Base):
     last_name: Mapped[str]
     position: Mapped[str]
     can_check: Mapped[bool] = mapped_column(default=False)
-    encrypted_password: Mapped[str] = mapped_column(unique=True)
+    password: Mapped[str]
 
     notes: Mapped[list["Note"]] = relationship(back_populates="user")
     revisions: Mapped[list["Revision"]] = relationship(back_populates="user")
