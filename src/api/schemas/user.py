@@ -27,6 +27,11 @@ class User(BaseModel):
         )
 
 
+class GetManyUsersResponse(BaseModel):
+    count: int
+    result: list[User]
+
+
 class UserRegisterRequest(BaseModel):
     phone: Annotated[str, MinLen(11), MaxLen(12)]
     password: SecretStr
@@ -37,7 +42,7 @@ class UserRegisterRequest(BaseModel):
     can_check: bool = False
 
 
-class UserRegisterResponse(BaseModel):
+class UserAuthorizedResponse(BaseModel):
     pass
 
 

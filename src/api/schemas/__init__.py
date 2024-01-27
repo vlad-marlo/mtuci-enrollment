@@ -1,15 +1,17 @@
 from .user import (
+    GetManyUsersResponse,
     User,
     UserLoginRequest,
     UserRegisterRequest,
-    UserRegisterResponse,
+    UserAuthorizedResponse,
     UserShortInfo,
 )
 
 __all__ = (
+    "GetManyUsersResponse",
     "User",
     "UserLoginRequest",
     "UserRegisterRequest",
-    "UserRegisterResponse",
+    "UserAuthorizedResponse",
     "UserShortInfo",
 )
