@@ -37,6 +37,10 @@ class UserRegisterRequest(BaseModel):
     can_check: bool = False
 
 
+class UserRegisterResponse(BaseModel):
+    pass
+
+
 class UserLoginRequest(BaseModel):
     phone: str
     password: str
