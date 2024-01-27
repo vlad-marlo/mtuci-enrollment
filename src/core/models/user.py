@@ -15,7 +15,7 @@ class User(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     phone: Mapped[str] = mapped_column(unique=True)
     first_name: Mapped[str]
-    middle_name: Mapped[str]
+    middle_name: Mapped[str | None]
     last_name: Mapped[str]
     position: Mapped[str]
     can_check: Mapped[bool] = mapped_column(default=False)
