@@ -1,5 +1,5 @@
-from .users import router as UserRouter
+from .routers import UsersRouter
 
 routers = [
-    UserRouter,
+    UsersRouter,
 ]
