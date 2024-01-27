@@ -1,5 +1,3 @@
-from typing import Generator
-
 from asyncio import current_task
 
 from sqlalchemy.orm import declarative_base
