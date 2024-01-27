@@ -1,20 +1,23 @@
 from fastapi import APIRouter
 from src.api.schemas import (
     GetManyUsersResponse,
-    User, UserRegisterRequest, UserLoginRequest, UserAuthorizedResponse
+    User,
+    UserRegisterRequest,
+    UserLoginRequest,
+    UserAuthorizedResponse,
 )
 
-router: APIRouter = APIRouter(
-    tags=(
+router = APIRouter(
+    tags=[
         "Users",
-    ),
+    ],
     prefix="/users"
 )
 
 
 @router.get("/{user_id}")
 async def get_user_by_id(user_id: str) -> User:
-    pass
+    return User(id=int(user_id))
 
 
 @router.get("/")

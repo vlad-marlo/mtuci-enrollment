@@ -20,4 +20,4 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 USER appuser
 COPY . .
 EXPOSE 8000
-CMD gunicorn 'src:app' --bind=0.0.0.0:8080
+CMD ["uvicorn", "src:app", "--host", "0.0.0.0", "--port", "8080"]
