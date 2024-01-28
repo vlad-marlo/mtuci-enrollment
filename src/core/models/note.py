@@ -15,7 +15,7 @@ class Note(Base, UserMixin):
     __tablename__ = "notes"
     _user_back_populates = "note"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     text: Mapped[str]
     created_at: Mapped[datetime] = mapped_column(insert_default=func.now())
     status: Mapped[int]
