@@ -6,6 +6,10 @@ from sqlalchemy.orm import Mapped, mapped_column, validates
 from .database import Base
 from .mixins import UserMixin
 
+STATUS_CREATED = 0
+STATUS_PENDING_CHANGES = -1
+STATUS_APPROVED = 1
+
 
 class Note(Base, UserMixin):
     __tablename__ = "notes"
