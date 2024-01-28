@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from src.core.models import User, Note
+from src.core.models import User, Note, Revision
 
 
 class BaseUserStorage(ABC):
@@ -59,6 +59,9 @@ class BaseNotesStorage(ABC):
     ) -> list[Note]:
         """
         return all notes, related to user with status.
+
+        Statuses:
+        -1 Not
         """
         pass
 
@@ -67,3 +70,27 @@ class BaseNotesStorage(ABC):
         """return all notes, related to user with provided id"""
         pass
 
+
+class BaseRevisionsStorage(ABC):
+    """BaseRevisionsStorage is interface of store, which provide all
+    necessary methods to store, read and update Revisions in system."""
+
+    @abstractmethod
+    async def create(self, revision: Revision) -> Revision:
+        pass
+
+    @abstractmethod
+    async def get_all_by_user(self, user_id: int) -> list[Revision]:
+        pass
+
+    @abstractmethod
+    async def get_all_by_note_id(self, note_id: int) -> list[Revision]:
+        pass
+
+    @abstractmethod
+    async def get_by_id(self, revision_id: int) -> Revision | None:
+        pass
+
+    @abstractmethod
+    async def get_all(self) -> list[Revision]:
+        pass
