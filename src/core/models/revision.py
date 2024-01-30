@@ -20,6 +20,7 @@ class Revision(Base):
     note_id: Mapped[int] = mapped_column(
         ForeignKey("notes.id"),
         nullable=False,
+        unique=True,
     )
     created_by: Mapped[int] = mapped_column(
         ForeignKey("users.id"),
