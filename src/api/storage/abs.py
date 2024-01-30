@@ -42,7 +42,7 @@ class BaseNotesStorage(ABC):
         pass
 
     @abstractmethod
-    async def update(self, note: Note) -> Note:
+    async def update(self, note: Note) -> None:
         """update updates note and returns changed Note to user"""
         pass
 

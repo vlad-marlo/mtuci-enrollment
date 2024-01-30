@@ -20,9 +20,10 @@ class NotesStorage(BaseNotesStorage):
         return note
 
     @lock
-    async def update(self, note: Note) -> Note:
+    async def update(self, note: Note, **kwargs) -> None:
         """update updates note and returns changed Note to user"""
-        pass
+        stmt = update(Note).where(Note.id == note.id).values(**kwargs)
+        await self._session.execute(stmt)
 
     @lock
     async def delete(self, note: Note) -> None:
