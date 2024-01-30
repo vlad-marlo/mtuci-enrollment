@@ -7,6 +7,7 @@ from .database import Base
 if TYPE_CHECKING:
     from .note import Note
     from .revision import Revision
+    from .token import Token
 
 
 class User(Base):
@@ -23,6 +24,7 @@ class User(Base):
 
     notes: Mapped[list["Note"]] = relationship(back_populates="user")
     revisions: Mapped[list["Revision"]] = relationship(back_populates="user")
+    tokens: Mapped[list["Token"]] = relationship(back_populates="user")
 
     def __str__(self):
         return (
