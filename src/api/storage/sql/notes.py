@@ -1,7 +1,7 @@
 from sqlalchemy import select, and_, desc, false, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.api.storage.abs import BaseNotesStorage
+from src.api.storage import BaseNotesStorage
 from src.core.models import Note
 from src.sync_decorator import with_lock
 
