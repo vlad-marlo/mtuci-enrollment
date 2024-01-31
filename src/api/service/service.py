@@ -2,18 +2,17 @@ from .notes import NotesService
 from .revision import RevisionService
 from .user import UserService
 
+from src.api.storage import BaseStorage
+
 
 class Service:
     def __init__(
             self,
-            *,
-            notes_service: NotesService,
-            revision_service: RevisionService,
-            user_service: UserService,
+            storage: BaseStorage,
     ) -> None:
-        self.__notes = notes_service
-        self.__revision = revision_service
-        self.__user = user_service
+        self.__notes = NotesService(storage.note())
+        self.__revision = RevisionService(storage.revision())
+        self.__user = UserService(storage.user())
 
     @property
     def notes(self) -> NotesService:
