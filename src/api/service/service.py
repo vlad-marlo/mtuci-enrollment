@@ -29,5 +29,5 @@ class Service:
     def user(self) -> UserService:
         return self.__user
 
-    def replace_session(self, session: AsyncSession) -> None:
-        self.__storage.replace_session(session)
+    async def replace_session(self, session: AsyncSession) -> None:
+        await self.__storage.replace_session(session)

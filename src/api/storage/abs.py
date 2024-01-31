@@ -33,6 +33,10 @@ class BaseUserStorage(ABC):
         """
         pass
 
+    @abstractmethod
+    async def can_check(self, user_id: int) -> bool:
+        pass
+
 
 class BaseNotesStorage(ABC):
     """BaseNotesStorage is interface of store, which provide all
@@ -112,5 +116,5 @@ class BaseStorage(ABC):
         pass
 
     @abstractmethod
-    def replace_session(self, session: AsyncSession) -> None:
+    async def replace_session(self, session: AsyncSession) -> None:
         pass
