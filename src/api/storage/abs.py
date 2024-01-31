@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.core.models import User, Note, Revision
+from src.core.models import User, Note, Revision, Token
 
 
 class BaseUserStorage(ABC):
@@ -102,6 +102,16 @@ class BaseRevisionsStorage(ABC):
         pass
 
 
+class BaseTokenStorage(ABC):
+    @abstractmethod
+    async def create(self, user_id: Token) -> Token:
+        pass
+
+    @abstractmethod
+    async def get_by_token_value(self, value: str) -> Token | None:
+        pass
+
+
 class BaseStorage(ABC):
     @abstractmethod
     def user(self) -> BaseUserStorage:
@@ -113,6 +123,10 @@ class BaseStorage(ABC):
 
     @abstractmethod
     def note(self) -> BaseNotesStorage:
+        pass
+
+    @abstractmethod
+    def token(self) -> BaseTokenStorage:
         pass
 
     @abstractmethod
