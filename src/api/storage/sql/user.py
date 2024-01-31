@@ -14,13 +14,13 @@ class UserStorage(BaseUserStorage):
         self._session = session
 
     @lock
-    async def create_user(self, user: User) -> User:
+    async def create(self, user: User) -> User:
         self._session.add(user)
         await self._session.commit()
         return user
 
     @lock
-    async def get_user_by_id(self, user_id: int) -> User:
+    async def get_user_by_id(self, user_id: int) -> User | None:
         return await self._session.get(User, user_id)
 
     @lock

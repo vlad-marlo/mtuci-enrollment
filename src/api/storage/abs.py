@@ -8,7 +8,7 @@ class BaseUserStorage(ABC):
     necessary logic of storing and getting and filtering users in it."""
 
     @abstractmethod
-    async def create_user(self, user: User) -> User:
+    async def create(self, user: User) -> User:
         """Creates user and return created object back"""
         pass
 
@@ -42,7 +42,7 @@ class BaseNotesStorage(ABC):
         pass
 
     @abstractmethod
-    async def update(self, note: Note) -> None:
+    async def update(self, note: Note, **kwargs) -> None:
         """update updates note and returns changed Note to user"""
         pass
 
@@ -93,4 +93,18 @@ class BaseRevisionsStorage(ABC):
 
     @abstractmethod
     async def get_all(self) -> list[Revision]:
+        pass
+
+
+class BaseStorage(ABC):
+    @abstractmethod
+    def user(self) -> BaseUserStorage:
+        pass
+
+    @abstractmethod
+    def revision(self) -> BaseRevisionsStorage:
+        pass
+
+    @abstractmethod
+    def note(self) -> BaseNotesStorage:
         pass

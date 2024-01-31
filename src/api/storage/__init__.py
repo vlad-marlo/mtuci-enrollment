@@ -1,7 +1,13 @@
-from .abs import BaseUserStorage, BaseNotesStorage, BaseRevisionsStorage
+from .abs import (
+    BaseNotesStorage,
+    BaseRevisionsStorage,
+    BaseStorage,
+    BaseUserStorage,
+)
 
 __all__ = (
-    "BaseUserStorage",
     "BaseNotesStorage",
     "BaseRevisionsStorage",
+    "BaseStorage",
+    "BaseUserStorage",
 )
