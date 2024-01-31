@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.schemas import (
     GetManyUsersResponse,
@@ -23,45 +22,49 @@ router = APIRouter(
 )
 
 
-@router.get("/{user_id}")
-async def get_user_by_id(
-        user_id: int,
-        session: AsyncSession = Depends(db_helper.scoped_session_dependency)
-) -> User:
-    """get user by provided id"""
-
-    service = get_service(session)
-
-    user = await service.user.get_by_id(user_id)
-    if user:
-        return user
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND,
-        detail="User with id=%d not found" % user_id
-    )
-
-
 @router.get("/")
 async def get_users(
-        session: AsyncSession = Depends(db_helper.scoped_session_dependency)
+        service: Service = Depends(get_service)
 ) -> GetManyUsersResponse:
     """return all users"""
-
-    service = get_service(session)
     res = await service.user.get_all_users()
     return res
 
 
 @router.get("/me")
-async def get_me() -> User:
+async def get_me(
+        service: Service = Depends(get_service),
+) -> User:
     pass
 
 
 @router.post("/register")
-async def register_user(data: UserRegisterRequest) -> UserAuthorizedResponse:
+async def register_user(
+        data: UserRegisterRequest,
+        service: Service = Depends(get_service),
+) -> UserAuthorizedResponse:
     pass
 
 
 @router.post("/login")
-async def login_user(data: UserLoginRequest) -> UserAuthorizedResponse:
+async def login_user(
+        data: UserLoginRequest,
+        service: Service = Depends(get_service),
+) -> UserAuthorizedResponse:
     pass
+
+
+@router.get("/{user_id}")
+async def get_user_by_id(
+        user_id: int,
+        service: Service = Depends(get_service)
+) -> User:
+    """get user by provided id"""
+
+    user = await service.user.get_by_id(user_id)
+    if user:
+        return user
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail="User with id=%d not found" % user_id
+    )
