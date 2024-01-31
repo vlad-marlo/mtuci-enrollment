@@ -24,7 +24,8 @@
 **/charts
 **/docker-compose*
 **/compose*
-**/Dockerfile*
+infra/server.dockerfile
+infra/migrator.dockerfile
 **/node_modules
 **/npm-debug.log
 **/obj
