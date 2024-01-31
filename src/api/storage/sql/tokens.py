@@ -1,20 +1,25 @@
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.storage import BaseTokenStorage
 from src.core.models import Token
 
 
 class TokenStorage(BaseTokenStorage):
-    def __init__(self, session: AsyncSession):
-        self.__session = session
+    def __init__(self):
+        return
 
-    async def create(self, token: Token) -> Token:
-        self.__session.add(token)
-        await self.__session.commit()
+    async def create(self, token: Token, *, session: AsyncSession) -> Token:
+        session.add(token)
+        await session.commit()
         return token
 
-    async def get_by_token_value(self, value: str) -> Token | None:
+    async def get_by_token_value(
+            self,
+            value: str,
+            *,
+            session: AsyncSession,
+    ) -> Token | None:
         stmt = select(Token).where(Token.token == value)
-        res = await self.__session.execute(stmt)
+        res = await session.execute(stmt)
         return res.scalar_one_or_none()

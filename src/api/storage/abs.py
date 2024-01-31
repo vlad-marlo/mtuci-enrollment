@@ -10,12 +10,22 @@ class BaseUserStorage(ABC):
     necessary logic of storing and getting and filtering users in it."""
 
     @abstractmethod
-    async def create(self, user: User) -> User:
+    async def create(
+            self,
+            user: User,
+            *,
+            session: AsyncSession,
+    ) -> User:
         """Creates user and return created object back"""
         pass
 
     @abstractmethod
-    async def get_user_by_id(self, user_id: int) -> User | None:
+    async def get_user_by_id(
+            self,
+            user_id: int,
+            *,
+            session: AsyncSession,
+    ) -> User | None:
         """
         get_user_by_id
 
@@ -25,7 +35,7 @@ class BaseUserStorage(ABC):
         pass
 
     @abstractmethod
-    async def get_users(self) -> list[User]:
+    async def get_users(self, *, session: AsyncSession) -> list[User]:
         """
         get_users
 
@@ -34,7 +44,7 @@ class BaseUserStorage(ABC):
         pass
 
     @abstractmethod
-    async def can_check(self, user_id: int) -> bool:
+    async def can_check(self, user_id: int, *, session: AsyncSession) -> bool:
         pass
 
 
@@ -43,17 +53,23 @@ class BaseNotesStorage(ABC):
     necessary methods to store, read and update Notes in system."""
 
     @abstractmethod
-    async def create(self, note: Note) -> Note:
+    async def create(self, note: Note, *, session: AsyncSession) -> Note:
         """create stores note to system"""
         pass
 
     @abstractmethod
-    async def update(self, note: Note, **kwargs) -> None:
+    async def update(
+            self,
+            note: Note,
+            *,
+            session: AsyncSession,
+            **kwargs
+    ) -> None:
         """update updates note and returns changed Note to user"""
         pass
 
     @abstractmethod
-    async def delete(self, note: Note) -> None:
+    async def delete(self, note: Note, *, session: AsyncSession) -> None:
         """deletes note"""
         pass
 
@@ -62,6 +78,7 @@ class BaseNotesStorage(ABC):
             self,
             user_id: int,
             status: int,
+            session: AsyncSession,
     ) -> list[Note]:
         """
         return all notes, related to user with status.
@@ -72,7 +89,12 @@ class BaseNotesStorage(ABC):
         pass
 
     @abstractmethod
-    async def get_all_by_user_id(self, user_id: int) -> list[Note]:
+    async def get_all_by_user_id(
+            self,
+            user_id: int,
+            *,
+            session: AsyncSession
+    ) -> list[Note]:
         """return all notes, related to user with provided id"""
         pass
 
@@ -82,33 +104,58 @@ class BaseRevisionsStorage(ABC):
     necessary methods to store, read and update Revisions in system."""
 
     @abstractmethod
-    async def create(self, revision: Revision) -> Revision:
+    async def create(
+            self,
+            revision: Revision,
+            *,
+            session: AsyncSession,
+    ) -> Revision:
         pass
 
     @abstractmethod
-    async def get_all_by_user(self, user_id: int) -> list[Revision]:
+    async def get_all_by_user(
+            self,
+            user_id: int,
+            *,
+            session: AsyncSession,
+    ) -> list[Revision]:
         pass
 
     @abstractmethod
-    async def get_all_by_note_id(self, note_id: int) -> list[Revision]:
+    async def get_all_by_note_id(
+            self,
+            note_id: int,
+            *,
+            session: AsyncSession,
+    ) -> list[Revision]:
         pass
 
     @abstractmethod
-    async def get_by_id(self, revision_id: int) -> Revision | None:
+    async def get_by_id(
+            self,
+            revision_id: int,
+            *,
+            session: AsyncSession,
+    ) -> Revision | None:
         pass
 
     @abstractmethod
-    async def get_all(self) -> list[Revision]:
+    async def get_all(self, *, session: AsyncSession) -> list[Revision]:
         pass
 
 
 class BaseTokenStorage(ABC):
     @abstractmethod
-    async def create(self, user_id: Token) -> Token:
+    async def create(self, user_id: Token, *, session: AsyncSession) -> Token:
         pass
 
     @abstractmethod
-    async def get_by_token_value(self, value: str) -> Token | None:
+    async def get_by_token_value(
+            self,
+            value: str,
+            *,
+            session: AsyncSession,
+    ) -> Token | None:
         pass
 
 
@@ -127,8 +174,4 @@ class BaseStorage(ABC):
 
     @abstractmethod
     def token(self) -> BaseTokenStorage:
-        pass
-
-    @abstractmethod
-    async def replace_session(self, session: AsyncSession) -> None:
         pass

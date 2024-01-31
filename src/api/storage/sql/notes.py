@@ -6,31 +6,49 @@ from src.core.models import Note
 
 
 class NotesStorage(BaseNotesStorage):
-    def __init__(self, session: AsyncSession):
-        self.__session = session
+    def __init__(self):
+        return
 
-    def replace_session(self, session: AsyncSession) -> None:
-        self.__session = session
-
-    async def create(self, note: Note) -> Note:
+    async def create(
+            self,
+            note: Note,
+            *,
+            session: AsyncSession,
+    ) -> Note:
         """create stores note to system"""
-        self.__session.add(note)
-        await self.__session.commit()
+        session.add(note)
+        await session.commit()
         return note
 
-    async def update(self, note: Note, **kwargs) -> None:
+    async def update(
+            self,
+            note: Note,
+            *,
+            session: AsyncSession,
+            **kwargs,
+    ) -> None:
         """update updates note and returns changed Note to user"""
         stmt = update(Note).where(Note.id == note.id).values(**kwargs)
-        await self.__session.execute(stmt)
+        await session.execute(stmt)
 
-    async def delete(self, note: Note) -> None:
+    async def delete(
+            self,
+            note: Note,
+            *,
+            session: AsyncSession,
+    ) -> None:
         """deletes note"""
         stmt = update(Note).where(Note.id == note.id).values(is_deleted=True)
-        await self.__session.execute(stmt)
+        await session.execute(stmt)
         return None
 
-    async def __get_by_stmt(self, stmt) -> list[Note]:
-        result = await self.__session.execute(stmt)
+    async def __get_by_stmt(
+            self,
+            stmt,
+            *,
+            session: AsyncSession,
+    ) -> list[Note]:
+        result = await session.execute(stmt)
         notes = result.scalars().all()
         return list(notes)
 
@@ -38,6 +56,9 @@ class NotesStorage(BaseNotesStorage):
             self,
             user_id: int,
             status: int,
+            *,
+            session: AsyncSession,
+
     ) -> list[Note]:
         """
         return all notes, related to user with status.
@@ -54,10 +75,15 @@ class NotesStorage(BaseNotesStorage):
                 ),
             ).order_by(desc(Note.created_at))
         )
-        result = await self.__get_by_stmt(stmt)
+        result = await self.__get_by_stmt(stmt, session=session)
         return result
 
-    async def get_all_by_user_id(self, user_id: int) -> list[Note]:
+    async def get_all_by_user_id(
+            self,
+            user_id: int,
+            *,
+            session: AsyncSession,
+    ) -> list[Note]:
         """return all notes, related to user with provided id"""
         stmt = (
             select(Note)
@@ -69,5 +95,5 @@ class NotesStorage(BaseNotesStorage):
             )
             .order_by(desc(Note.created_at))
         )
-        result = await self.__get_by_stmt(stmt)
+        result = await self.__get_by_stmt(stmt, session=session)
         return result

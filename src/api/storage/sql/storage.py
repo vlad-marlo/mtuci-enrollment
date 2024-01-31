@@ -1,24 +1,22 @@
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from src.api.storage import (
     BaseNotesStorage,
     BaseRevisionsStorage,
     BaseStorage,
-    BaseUserStorage, BaseTokenStorage,
+    BaseTokenStorage,
+    BaseUserStorage,
 )
 from src.api.storage.sql.notes import NotesStorage
 from src.api.storage.sql.revisions import RevisionStorage
+from src.api.storage.sql.tokens import TokenStorage
 from src.api.storage.sql.user import UserStorage
-from src.core.models import db_helper
 
 
 class Storage(BaseStorage):
-    def __init__(self, session: AsyncSession):
-        self.__notes = NotesStorage(session)
-        self.__revision = RevisionStorage(session)
-        self.__user = UserStorage(session)
-        self.__token = TokenStorage(session)
-        self.__session = session
+    def __init__(self):
+        self.__notes = NotesStorage()
+        self.__revision = RevisionStorage()
+        self.__user = UserStorage()
+        self.__token = TokenStorage()
 
     def note(self) -> BaseNotesStorage:
         return self.__notes
@@ -31,17 +29,3 @@ class Storage(BaseStorage):
 
     def user(self) -> BaseUserStorage:
         return self.__user
-
-    async def replace_session(self, session: AsyncSession) -> None:
-        await self.__session.close()
-        self.__notes.replace_session(session)
-        self.__revision.replace_session(session)
-        self.__user.replace_session(session)
-
-
-__storage = Storage(db_helper.get_scoped_session())
-
-
-def get_storage(session: AsyncSession) -> Storage:
-    __storage.replace_session(session)
-    return __storage
