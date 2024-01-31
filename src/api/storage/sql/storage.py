@@ -4,7 +4,7 @@ from src.api.storage import (
     BaseNotesStorage,
     BaseRevisionsStorage,
     BaseStorage,
-    BaseUserStorage,
+    BaseUserStorage, BaseTokenStorage,
 )
 from src.api.storage.sql.notes import NotesStorage
 from src.api.storage.sql.revisions import RevisionStorage
@@ -17,6 +17,7 @@ class Storage(BaseStorage):
         self.__notes = NotesStorage(session)
         self.__revision = RevisionStorage(session)
         self.__user = UserStorage(session)
+        self.__token = TokenStorage(session)
         self.__session = session
 
     def note(self) -> BaseNotesStorage:
@@ -24,6 +25,9 @@ class Storage(BaseStorage):
 
     def revision(self) -> BaseRevisionsStorage:
         return self.__revision
+
+    def token(self) -> BaseTokenStorage:
+        return self.__token
 
     def user(self) -> BaseUserStorage:
         return self.__user
