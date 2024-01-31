@@ -15,8 +15,8 @@ class User(BaseModel):
     model_config = ConfigDict(
         from_attributes=True,
         extra="forbid",
-
     )
+
     id: int
     phone: Annotated[str, MinLen(11), MaxLen(12)]
     first_name: str

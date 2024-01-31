@@ -1,3 +1,5 @@
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from .notes import NotesService
 from .revision import RevisionService
 from .user import UserService
@@ -10,6 +12,7 @@ class Service:
             self,
             storage: BaseStorage,
     ) -> None:
+        self.__storage = storage
         self.__notes = NotesService(storage.note())
         self.__revision = RevisionService(storage.revision())
         self.__user = UserService(storage.user())
@@ -25,3 +28,6 @@ class Service:
     @property
     def user(self) -> UserService:
         return self.__user
+
+    def replace_session(self, session: AsyncSession) -> None:
+        self.__storage.replace_session(session)

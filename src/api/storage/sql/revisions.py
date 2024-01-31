@@ -12,6 +12,9 @@ class RevisionStorage(BaseRevisionsStorage):
     def __init__(self, session: AsyncSession):
         self.__session = session
 
+    def replace_session(self, session: AsyncSession) -> None:
+        self.__session = session
+
     @lock
     async def create(self, revision: Revision) -> Revision:
         self.__session.add(revision)

@@ -11,6 +11,7 @@ from src.api.storage.sql import (
     RevisionStorage,
     UserStorage,
 )
+from src.core.models import db_helper
 
 
 class Storage(BaseStorage):
@@ -27,3 +28,16 @@ class Storage(BaseStorage):
 
     def user(self) -> BaseUserStorage:
         return self.__user
+
+    def replace_session(self, session: AsyncSession) -> None:
+        self.__notes.replace_session(session)
+        self.__revision.replace_session(session)
+        self.__user.replace_session(session)
+
+
+__storage = Storage(db_helper.get_scoped_session())
+
+
+def get_storage(session: AsyncSession) -> Storage:
+    __storage.replace_session(session)
+    return __storage

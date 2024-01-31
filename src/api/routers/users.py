@@ -1,4 +1,8 @@
-from fastapi import APIRouter
+from typing import Annotated
+
+from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from src.api.schemas import (
     GetManyUsersResponse,
     User,
@@ -6,6 +10,12 @@ from src.api.schemas import (
     UserLoginRequest,
     UserAuthorizedResponse,
 )
+from src.api.service import Service
+from src.api.storage.sql import Storage
+from src.core.models import db_helper
+from .service_helper import get_service
+
+s = Service(Storage(db_helper.get_scoped_session()))
 
 router = APIRouter(
     tags=[
@@ -16,13 +26,22 @@ router = APIRouter(
 
 
 @router.get("/{user_id}")
-async def get_user_by_id(user_id: str) -> User:
-    return User(id=int(user_id))
+async def get_user_by_id(
+        user_id: str,
+        session: AsyncSession = Depends(db_helper.scoped_session_dependency)
+) -> User:
+    service = get_service(session)
+
+    res = await service.user.get_by_id(user_id)
+    return res
 
 
 @router.get("/")
-async def get_users() -> GetManyUsersResponse:
-    pass
+async def get_users(
+        session: AsyncSession = Depends(db_helper.scoped_session_dependency)
+) -> GetManyUsersResponse:
+    service = get_service(session)
+    return service.user.get_all_users()
 
 
 @router.get("/me")

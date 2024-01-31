@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from src.core.models import User, Note, Revision
 
 
@@ -107,4 +109,8 @@ class BaseStorage(ABC):
 
     @abstractmethod
     def note(self) -> BaseNotesStorage:
+        pass
+
+    @abstractmethod
+    def replace_session(self, session: AsyncSession) -> None:
         pass

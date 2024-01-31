@@ -1,8 +1,8 @@
-from src.api.storage import BaseUserStorage
 from src.api.schemas import (
     GetManyUsersResponse,
     User,
 )
+from src.api.storage import BaseUserStorage
 
 
 class UserService:
@@ -18,4 +18,7 @@ class UserService:
         )
         return response
 
+    async def get_by_id(self, user_id: int) -> User:
+        user_from_db = await self.__storage.get_user_by_id(user_id)
+        return User.model_validate(user_from_db)
 

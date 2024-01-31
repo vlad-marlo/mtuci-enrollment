@@ -10,31 +10,34 @@ lock = with_lock()
 
 class NotesStorage(BaseNotesStorage):
     def __init__(self, session: AsyncSession):
-        self._session = session
+        self.__session = session
+
+    def replace_session(self, session: AsyncSession) -> None:
+        self.__session = session
 
     @lock
     async def create(self, note: Note) -> Note:
         """create stores note to system"""
-        self._session.add(note)
-        await self._session.commit()
+        self.__session.add(note)
+        await self.__session.commit()
         return note
 
     @lock
     async def update(self, note: Note, **kwargs) -> None:
         """update updates note and returns changed Note to user"""
         stmt = update(Note).where(Note.id == note.id).values(**kwargs)
-        await self._session.execute(stmt)
+        await self.__session.execute(stmt)
 
     @lock
     async def delete(self, note: Note) -> None:
         """deletes note"""
         stmt = update(Note).where(Note.id == note.id).values(is_deleted=True)
-        await self._session.execute(stmt)
+        await self.__session.execute(stmt)
         return None
 
     @lock
     async def __get_by_stmt(self, stmt) -> list[Note]:
-        result = await self._session.execute(stmt)
+        result = await self.__session.execute(stmt)
         notes = result.scalars().all()
         return list(notes)
 
