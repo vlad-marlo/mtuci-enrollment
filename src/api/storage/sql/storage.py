@@ -6,11 +6,9 @@ from src.api.storage import (
     BaseStorage,
     BaseUserStorage,
 )
-from src.api.storage.sql import (
-    NotesStorage,
-    RevisionStorage,
-    UserStorage,
-)
+from src.api.storage.sql.notes import NotesStorage
+from src.api.storage.sql.revisions import RevisionStorage
+from src.api.storage.sql.user import UserStorage
 from src.core.models import db_helper
 
 
@@ -19,6 +17,7 @@ class Storage(BaseStorage):
         self.__notes = NotesStorage(session)
         self.__revision = RevisionStorage(session)
         self.__user = UserStorage(session)
+        self.__session = session
 
     def note(self) -> BaseNotesStorage:
         return self.__notes
@@ -29,7 +28,8 @@ class Storage(BaseStorage):
     def user(self) -> BaseUserStorage:
         return self.__user
 
-    def replace_session(self, session: AsyncSession) -> None:
+    async def replace_session(self, session: AsyncSession) -> None:
+        await self.__session.close()
         self.__notes.replace_session(session)
         self.__revision.replace_session(session)
         self.__user.replace_session(session)
