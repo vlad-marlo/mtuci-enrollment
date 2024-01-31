@@ -8,5 +8,7 @@ __service = Service(get_storage(db_helper.get_scoped_session()))
 
 
 def get_service(session: AsyncSession) -> Service:
+    """get_service is accessor to singleton service object"""
+
     __service.replace_session(session)
     return __service

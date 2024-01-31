@@ -1,6 +1,4 @@
-from typing import Annotated
-
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.schemas import (
@@ -27,21 +25,31 @@ router = APIRouter(
 
 @router.get("/{user_id}")
 async def get_user_by_id(
-        user_id: str,
+        user_id: int,
         session: AsyncSession = Depends(db_helper.scoped_session_dependency)
 ) -> User:
+    """get user by provided id"""
+
     service = get_service(session)
 
-    res = await service.user.get_by_id(user_id)
-    return res
+    user = await service.user.get_by_id(user_id)
+    if user:
+        return user
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail="User with id=%d not found" % user_id
+    )
 
 
 @router.get("/")
 async def get_users(
         session: AsyncSession = Depends(db_helper.scoped_session_dependency)
 ) -> GetManyUsersResponse:
+    """return all users"""
+
     service = get_service(session)
-    return service.user.get_all_users()
+    res = await service.user.get_all_users()
+    return res
 
 
 @router.get("/me")
