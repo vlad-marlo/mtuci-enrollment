@@ -1,11 +1,8 @@
-from sqlalchemy import select, and_, desc, false, update
+from sqlalchemy import select, and_, desc, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.storage import BaseNotesStorage
 from src.core.models import Note
-from src.sync_decorator import with_lock
-
-lock = with_lock()
 
 
 class NotesStorage(BaseNotesStorage):
@@ -15,27 +12,23 @@ class NotesStorage(BaseNotesStorage):
     def replace_session(self, session: AsyncSession) -> None:
         self.__session = session
 
-    @lock
     async def create(self, note: Note) -> Note:
         """create stores note to system"""
         self.__session.add(note)
         await self.__session.commit()
         return note
 
-    @lock
     async def update(self, note: Note, **kwargs) -> None:
         """update updates note and returns changed Note to user"""
         stmt = update(Note).where(Note.id == note.id).values(**kwargs)
         await self.__session.execute(stmt)
 
-    @lock
     async def delete(self, note: Note) -> None:
         """deletes note"""
         stmt = update(Note).where(Note.id == note.id).values(is_deleted=True)
         await self.__session.execute(stmt)
         return None
 
-    @lock
     async def __get_by_stmt(self, stmt) -> list[Note]:
         result = await self.__session.execute(stmt)
         notes = result.scalars().all()
