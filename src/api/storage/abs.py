@@ -84,16 +84,24 @@ class BaseNotesStorage(ABC):
     @abstractmethod
     async def update(
             self,
-            note: Note,
-            *,
+            note_id: int,
+            text: str,
             session: AsyncSession,
-            **kwargs
     ) -> None:
         """update updates note and returns changed Note to user"""
         pass
 
     @abstractmethod
-    async def delete(self, note: Note, *, session: AsyncSession) -> None:
+    async def user_can_edit(
+            self,
+            note_id: int,
+            user: int,
+            session: AsyncSession,
+    ) -> bool:
+        pass
+
+    @abstractmethod
+    async def delete(self, note_id: int, *, session: AsyncSession) -> None:
         """deletes note"""
         pass
 

@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.api.schemas.notes import (
     GetAllNotesResponse,
     NoteCreationRequest,
+    NoteUpdateRequest,
     NoteCreateResponse,
     Note,
 )
@@ -68,5 +69,50 @@ async def get_by_id(
         note_id: int,
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ) -> Note:
-    service.notes.get_by_id()
+    try:
+        resp = await service.notes.get_by_id(note_id, session)
+    except ServiceException as e:
+        raise HTTPException(detail=e.detail, status_code=e.code)
+    except Exception as e:
+        logger.error(f"got unexpected exception trowed {e}")
+        raise HTTPException(
+            detail="unknown error",
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+    else:
+        return resp
+
+
+@router.patch("/{note_id}")
+async def update_patch(
+        note_id: int,
+        token: str,
+        req: NoteUpdateRequest,
+        session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+) -> Note:
+    return await update_logic(note_id, token, req, session)
+
+
+@router.put("/{note_id}")
+async def update_put(
+        note_id: int,
+        token: str,
+        req: NoteUpdateRequest,
+        session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+) -> Note:
+    return await update_logic(note_id, token, req, session)
+
+
+async def update_logic(
+        note_id: int,
+        token: str,
+        req: NoteUpdateRequest,
+        session: AsyncSession,
+) -> Note:
+    return await service.notes.update(
+        note_id=note_id,
+        token=token,
+        text=req.text,
+        session=session,
+    )
 

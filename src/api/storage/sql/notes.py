@@ -1,4 +1,4 @@
-from sqlalchemy import select, and_, desc, update
+from sqlalchemy import select, and_, desc, update, exists
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.storage import BaseNotesStorage
@@ -22,28 +22,43 @@ class NotesStorage(BaseNotesStorage):
 
     async def update(
             self,
-            note: Note,
-            *,
+            note_id: int,
+            text: str,
             session: AsyncSession,
-            **kwargs,
     ) -> None:
         """update updates note and returns changed Note to user"""
-        stmt = update(Note).where(Note.id == note.id).values(**kwargs)
+
+        stmt = update(Note).where(Note.id == note_id).values(text=text)
         await session.execute(stmt)
 
     async def delete(
             self,
-            note: Note,
+            note_id: int,
             *,
             session: AsyncSession,
     ) -> None:
         """deletes note"""
-        stmt = update(Note).where(Note.id == note.id).values(is_deleted=True)
+        stmt = update(Note).where(Note.id == note_id).values(is_deleted=True)
         await session.execute(stmt)
         return None
 
-    async def __get_by_stmt(
+    async def user_can_edit(
             self,
+            note_id: int,
+            user: int,
+            session: AsyncSession,
+    ) -> bool:
+        stmt = select(Note).where(
+            and_(
+                Note.id == note_id,
+                Note.created_by == user,
+                not Note.is_deleted,
+            )
+        ).exists()
+        return await session.scalar(stmt)
+
+    @staticmethod
+    async def __get_by_stmt(
             stmt,
             *,
             session: AsyncSession,

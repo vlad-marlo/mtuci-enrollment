@@ -167,3 +167,47 @@ class NotesService:
                 code=status.HTTP_404_NOT_FOUND,
             )
         return await self.__get_full_info(session, note)
+
+    async def update(
+            self,
+            note_id: int,
+            token: str,
+            text: str,
+            session: AsyncSession,
+    ) -> Note:
+        user = self.__token.get_user_id(token, session)
+        if user is None:
+            raise ServiceException(
+                code=status.HTTP_401_UNAUTHORIZED,
+                detail="bad auth credentials"
+            )
+        if not self.__storage.note().user_can_edit(note_id, user, session):
+            raise ServiceException(
+                code=status.HTTP_403_FORBIDDEN,
+                detail="you are not a creator of this note"
+            )
+        await self.__storage.note().update(
+            note_id=note_id,
+            text=text,
+            session=session,
+        )
+        return await self.get_by_id(note_id, session)
+
+    async def delete(
+            self,
+            note_id: int,
+            token: str,
+            session: AsyncSession,
+    ) -> None:
+        user = self.__token.get_user_id(token, session)
+        if user is None:
+            raise ServiceException(
+                code=status.HTTP_401_UNAUTHORIZED,
+                detail="bad auth credentials"
+            )
+        if not self.__storage.note().user_can_edit(note_id, user, session):
+            raise ServiceException(
+                code=status.HTTP_403_FORBIDDEN,
+                detail="you are not a creator of this note"
+            )
+        await self.__storage.note().delete(note_id, session=session)
