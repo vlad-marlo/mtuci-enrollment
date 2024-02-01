@@ -12,13 +12,15 @@ from src.api.schemas import (
     UserLoginRequest,
     UserAuthorizedResponse,
 )
+from src.api.service.token import TokenService
 from src.api.storage import BaseStorage
 from src.core.models import Token
 from src.core.models.user import User as DatabaseUser
 
 
 class UserService:
-    def __init__(self, storage: BaseStorage):
+    def __init__(self, storage: BaseStorage, tokens: TokenService):
+        self.__tokens = tokens
         self.__storage = storage
 
     async def get_all_users(
@@ -103,18 +105,22 @@ class UserService:
                     session=session,
                 )
             )
+            self.__tokens.add_token(token)
         except Exception as e:
             raise ServiceException(log=f"unknown exception {e}")
         return UserAuthorizedResponse(token=token.token)
 
-    def get_by_token(self, token: str, session: AsyncSession) -> User | None:
+    def get_by_token(self, token: str, session: AsyncSession) -> User:
+        unauthorized = ServiceException(
+            detail="unauthorized",
+            code=status.HTTP_401_UNAUTHORIZED
+        )
+
+        user_id = self.__tokens.get_user_id(token, session)
+        if user_id is None:
+            raise unauthorized
         try:
-            token_value: Token | None = self.__storage.token().get_by_token_value(
-                token,
-                session=session,
-            )
-            if token_value is None:
-                return None
+            user = self.__storage.user().get_user_by_id(token, session=session)
         except Exception as e:
             raise ServiceException(
                 detail="unknown error",
@@ -122,4 +128,6 @@ class UserService:
                 code=status.HTTP_401_UNAUTHORIZED
             )
         else:
-            return token_value.user
+            if user is None:
+                raise unauthorized
+            return user
