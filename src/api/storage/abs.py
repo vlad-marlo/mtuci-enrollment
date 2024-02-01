@@ -98,10 +98,10 @@ class BaseNotesStorage(ABC):
         pass
 
     @abstractmethod
-    async def get_all_by_user_id_with_status(
+    async def get_all_by_user_id_and_passing(
             self,
             user_id: int,
-            status: int,
+            passed: bool,
             session: AsyncSession,
     ) -> list[Note]:
         """
@@ -120,6 +120,42 @@ class BaseNotesStorage(ABC):
             session: AsyncSession
     ) -> list[Note]:
         """return all notes, related to user with provided id"""
+        pass
+
+    @abstractmethod
+    async def get_all(self, session: AsyncSession) -> list[Note]:
+        pass
+
+    @abstractmethod
+    async def get_all_with_revisions(self, session: AsyncSession) -> list[
+        Note]:
+        pass
+
+    @abstractmethod
+    async def get_all_by_revision_passing(
+            self,
+            session: AsyncSession,
+            revision_passed: bool,
+    ) -> list[Note]:
+        pass
+
+    @abstractmethod
+    async def get_all_with_no_revisions(
+            self,
+            session: AsyncSession,
+    ) -> list[Note]:
+        pass
+
+    @abstractmethod
+    async def get_all_by_user_with_any_revisions(
+            self,
+            session: AsyncSession,
+            user_id: int
+    ) -> list[Note]:
+        pass
+
+    @abstractmethod
+    async def get_all_with_user_and_no_revisions(self, session: AsyncSession):
         pass
 
 
