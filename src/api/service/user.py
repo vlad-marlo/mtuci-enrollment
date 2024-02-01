@@ -68,3 +68,30 @@ class UserService:
     def __generate_token(user_id: int) -> Token:
         token = random.choices(string.printable, k=20)
         return Token(user_id=user_id, token=token)
+
+    async def login(
+            self,
+            user: UserLoginRequest,
+            session: AsyncSession,
+    ) -> UserAuthorizedResponse:
+        auth_user = await self.__storage.user().get_auth_data_by_phone(
+            phone=user.phone,
+            session=session,
+        )
+        if auth_user is None or auth_user.password != user.password:
+            raise ServiceException(
+                code=status.HTTP_401_UNAUTHORIZED,
+                detail="Bad auth credentials",
+            )
+        try:
+            token = await (
+                self.__storage
+                .token()
+                .create(
+                    self.__generate_token(auth_user.id),
+                    session=session,
+                )
+            )
+        except Exception as e:
+            raise ServiceException(log=f"unknown exception {e}")
+        return UserAuthorizedResponse(token=token.token)
