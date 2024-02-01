@@ -1,8 +1,14 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.api.schemas.notes import GetAllNotesResponse
+from src.api.schemas.notes import (
+    GetAllNotesResponse,
+    NoteCreationRequest,
+    NoteCreateResponse,
+    Note,
+)
 from src.core.models import db_helper
+from src.logger import logger
 from .service_helper import service
 from ..exceptions import ServiceException
 
@@ -12,6 +18,26 @@ router = APIRouter(
     ],
     prefix="/notes"
 )
+
+
+@router.post("/")
+async def create(
+        token: str,
+        request: NoteCreationRequest,
+        session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+) -> NoteCreateResponse:
+    try:
+        response = await service.notes.create(token, request.text, session)
+    except ServiceException as e:
+        raise HTTPException(status_code=e.code, detail=e.detail)
+    except Exception as e:
+        logger.error(e)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error"
+        )
+    else:
+        return response
 
 
 @router.get("/")
@@ -35,3 +61,12 @@ async def get_all(
         raise HTTPException(detail=e.detail, status_code=e.code)
     else:
         return response
+
+
+@router.get("/{note_id}")
+async def get_by_id(
+        note_id: int,
+        session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+) -> Note:
+    service.notes.get_by_id()
+

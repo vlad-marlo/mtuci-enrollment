@@ -5,13 +5,12 @@ from pydantic import BaseModel
 from src.api.schemas.revision import RevisionShortInfo
 
 
-class Note(BaseModel):
-    id: int
-    text: str
-    created_at: datetime
-
-
 class NoteCreationRequest(BaseModel):
+    text: str
+
+
+class NoteCreateResponse(BaseModel):
+    id: int
     text: str
 
 
@@ -19,7 +18,7 @@ class NoteUpdateRequest(BaseModel):
     text: str
 
 
-class NoteShortInfo(BaseModel):
+class Note(BaseModel):
     id: int
     text: str
     created_at: datetime
@@ -28,4 +27,4 @@ class NoteShortInfo(BaseModel):
 
 
 class GetAllNotesResponse(BaseModel):
-    result: list[NoteShortInfo]
+    result: list[Note]

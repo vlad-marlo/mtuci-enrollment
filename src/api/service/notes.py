@@ -1,13 +1,21 @@
+from fastapi import status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.api.schemas.notes import GetAllNotesResponse, NoteShortInfo
+from src.api.exceptions import ServiceException
+from src.api.schemas.notes import (
+    GetAllNotesResponse,
+    Note,
+    NoteCreateResponse,
+)
 from src.api.schemas.revision import RevisionShortInfo
+from src.api.service.token import TokenService
 from src.api.storage import BaseStorage
 from src.core.models import Note, Revision
 
 
 class NotesService:
-    def __init__(self, storage: BaseStorage):
+    def __init__(self, storage: BaseStorage, token: TokenService):
+        self.__token = token
         self.__storage = storage
 
     async def get_all(
@@ -32,14 +40,14 @@ class NotesService:
             self,
             session: AsyncSession,
             note: Note,
-    ) -> NoteShortInfo:
+    ) -> Note:
         revision: Revision | None = await (
             self.__storage.revision().get_by_note_id(
                 note.id,
                 session=session,
             )
         )
-        result = NoteShortInfo(
+        result = Note(
             id=note.id,
             created_at=note.created_at,
             created_by=note.created_by,
@@ -54,7 +62,7 @@ class NotesService:
             passed=revision.passed,
             created_by=revision.created_by
         )
-        return NoteShortInfo(
+        return Note(
             id=note.id,
             revision=revision_short,
             created_by=note.created_by,
@@ -120,3 +128,33 @@ class NotesService:
             user_id=user_id,
             passed=revision_passed
         )
+
+    async def create(
+            self,
+            user_token: str,
+            text: str,
+            session: AsyncSession,
+    ) -> NoteCreateResponse:
+        user_id = self.__token.get_user_id(user_token, session=session)
+        if user_id is None:
+            raise ServiceException(
+                detail="unauthorized",
+                code=status.HTTP_401_UNAUTHORIZED,
+            )
+        note = Note(
+            text=text,
+            is_deleted=False,
+            created_by=user_id,
+        )
+        try:
+            note = await self.__storage.note().create(note, session=session)
+        except Exception as e:
+            raise ServiceException(
+                detail="unknown error",
+                log=f"exception e={e}",
+            )
+        else:
+            return NoteCreateResponse(
+                id=note.id,
+                text=note.text,
+            )

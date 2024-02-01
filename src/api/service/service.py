@@ -1,9 +1,8 @@
+from src.api.storage import BaseStorage
 from .notes import NotesService
 from .revision import RevisionService
 from .token import TokenService
 from .user import UserService
-
-from src.api.storage import BaseStorage
 
 
 class Service:
@@ -11,11 +10,12 @@ class Service:
             self,
             storage: BaseStorage,
     ) -> None:
+        token_service = TokenService(storage)
         self.__storage = storage
-        self.__notes = NotesService(storage)
+        self.__notes = NotesService(storage, token_service)
         self.__revision = RevisionService(storage)
-        self.__token = TokenService(storage)
-        self.__user = UserService(storage, self.__token)
+        self.__user = UserService(storage, token_service)
+        self.__token = token_service
 
     @property
     def notes(self) -> NotesService:
