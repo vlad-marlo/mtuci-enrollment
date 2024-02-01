@@ -30,7 +30,7 @@ class RevisionStorage(BaseRevisionsStorage):
         revisions = result.scalars().all()
         return list(revisions)
 
-    async def get_all_by_note_id(
+    async def get_by_note_id(
             self,
             note_id: int,
             *,
