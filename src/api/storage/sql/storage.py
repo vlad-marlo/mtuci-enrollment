@@ -7,8 +7,8 @@ from src.api.storage import (
 )
 from src.api.storage.sql.notes import NotesStorage
 from src.api.storage.sql.revisions import RevisionStorage
-from src.api.storage.sql.tokens import TokenStorage
 from src.api.storage.sql.user import UserStorage
+from src.api.storage.sql.tokens import TokenStorage
 
 
 class Storage(BaseStorage):

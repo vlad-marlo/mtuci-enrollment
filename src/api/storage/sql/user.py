@@ -27,7 +27,7 @@ class UserStorage(BaseUserStorage):
     ) -> User | None:
         return await session.get(User, user_id)
 
-    async def get_user_by_phone(
+    async def get_by_phone(
             self,
             phone: str,
             *,
