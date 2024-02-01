@@ -1,13 +1,15 @@
 import random
 import string
 
-from sqlalchemy.exc import SQLAlchemyError
+from fastapi import status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.api.exceptions import ServiceException
 from src.api.schemas import (
     GetManyUsersResponse,
     User,
     UserRegisterRequest,
+    UserLoginRequest,
     UserAuthorizedResponse,
 )
 from src.api.storage import BaseStorage
@@ -46,26 +48,21 @@ class UserService:
             self,
             user_data: UserRegisterRequest,
             session: AsyncSession,
-    ) -> UserAuthorizedResponse:
+    ) -> UserAuthorizedResponse | None:
         user_dict = user_data.model_dump()
         user_dict["password"] = user_data.password.get_secret_value()
         user = DatabaseUser(**user_dict)
         async with session.begin():
-            try:
-                user = await self.__storage.user().create(
-                    user,
-                    session=session,
-                )
-                token = self.__generate_token(user.id)
-                token = await self.__storage.token().create(
-                    token,
-                    session=session,
-                )
-                await session.flush()
-            except SQLAlchemyError as e:
-                return
-            else:
-                return UserAuthorizedResponse(token=token.token)
+            user = await self.__storage.user().create(
+                user,
+                session=session,
+            )
+            token = self.__generate_token(user.id)
+            token = await self.__storage.token().create(
+                token,
+                session=session,
+            )
+        return UserAuthorizedResponse(token=token.token)
 
     @staticmethod
     def __generate_token(user_id: int) -> Token:
