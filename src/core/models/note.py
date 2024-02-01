@@ -1,13 +1,17 @@
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import func, ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .database import Base
 
 STATUS_CREATED = 0
 STATUS_PENDING_CHANGES = -1
 STATUS_APPROVED = 1
+
+if TYPE_CHECKING:
+    from .revision import Revision
 
 
 class Note(Base):
@@ -23,6 +27,8 @@ class Note(Base):
         unique=False,
         nullable=False,
     )
+
+    revision: Mapped["Revision"] = relationship(back_populates="note")
 
     def __str__(self) -> str:
         return (
