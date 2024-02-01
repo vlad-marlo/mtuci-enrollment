@@ -51,3 +51,30 @@ async def create_revision(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="revision was not created",
         )
+
+
+@router.get("/notes/{note_id}/revision")
+async def get_revision(
+        note_id: int,
+        session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+) -> RevisionShortInfo:
+    try:
+        res = await service.revision.get(
+            note_id=note_id,
+            session=session,
+        )
+    except ServiceException as e:
+        raise HTTPException(status_code=e.code, detail=e.detail)
+    except Exception as e:
+        logger.error(f'got unexpected exception e={e}')
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal error",
+        )
+    else:
+        if res is not None:
+            return res
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="revision was not created",
+        )

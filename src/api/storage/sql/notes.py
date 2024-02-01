@@ -1,8 +1,8 @@
-from sqlalchemy import select, and_, desc, update, exists
+from sqlalchemy import select, and_, desc, update, false, true
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.storage import BaseNotesStorage
-from src.core.models import Note
+from src.core.models import Note, Revision
 
 
 class NotesStorage(BaseNotesStorage):
@@ -52,7 +52,7 @@ class NotesStorage(BaseNotesStorage):
             and_(
                 Note.id == note_id,
                 Note.created_by == user,
-                not Note.is_deleted,
+                Note.is_deleted == false(),
             )
         ).exists()
         return await session.scalar(stmt)
@@ -82,9 +82,10 @@ class NotesStorage(BaseNotesStorage):
             select(Note)
             .where(
                 and_(
-                    Note.user_id == user_id,
-                    not Note.is_deleted,
-                    Note.revision.passed == passed,
+                    Note.created_by == user_id,
+                    Note.is_deleted == false(),
+                    Note.revision.isnot(None),
+                    Note.revision.has(passed=passed)
                 ),
             ).order_by(desc(Note.created_at))
         )
@@ -102,8 +103,8 @@ class NotesStorage(BaseNotesStorage):
             select(Note)
             .where(
                 and_(
-                    Note.user_id == user_id,
-                    not Note.is_deleted,
+                    Note.created_by == user_id,
+                    Note.is_deleted == false(),
                 ),
             )
             .order_by(desc(Note.created_at))
@@ -115,16 +116,12 @@ class NotesStorage(BaseNotesStorage):
         stmt = (
             select(Note)
             .where(
-                not Note.is_deleted,
-
+                Note.is_deleted == false(),
             )
             .order_by(desc(Note.created_at))
         )
         result = await self.__get_by_stmt(stmt, session=session)
         return result
-
-    async def get_all_with_revisions(self, session: AsyncSession):
-        pass
 
     async def get_all_by_revision_passing(
             self,
@@ -132,8 +129,14 @@ class NotesStorage(BaseNotesStorage):
             revision_passed: bool,
     ) -> list[Note]:
         stmt = (
-            select(Note)
-            .where(Note.revision.passed == revision_passed)
+            select(Note, )
+            .where(
+                and_(
+                    Note.revision.isnot(None),
+                    Note.revision.has(passed=revision_passed),
+                    Note.is_deleted == false(),
+                )
+            )
             .order_by(desc(Note.created_at))
         )
         return await self.__get_by_stmt(stmt, session=session)
@@ -144,7 +147,7 @@ class NotesStorage(BaseNotesStorage):
     ) -> list[Note]:
         stmt = (
             select(Note)
-            .where(Note.revision is None)
+            .where(Note.revision.is_(None))
             .order_by(desc(Note.created_at))
         )
         return await self.__get_by_stmt(stmt, session=session)
@@ -156,7 +159,7 @@ class NotesStorage(BaseNotesStorage):
     ) -> list[Note]:
         stmt = (
             select(Note)
-            .where(Note.revision is not None)
+            .where(Note.revision.isnot(None))
             .order_by(desc(Note.created_at))
         )
         return await self.__get_by_stmt(stmt, session=session)

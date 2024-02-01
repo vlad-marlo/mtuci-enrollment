@@ -58,3 +58,29 @@ class RevisionService:
             text=revision.text,
         )
 
+    async def get(
+            self,
+            note_id: int,
+            session: AsyncSession,
+    ) -> RevisionShortInfo:
+        try:
+            res = await self.__storage.revision().get_by_note_id(
+                note_id=note_id,
+                session=session
+            )
+            if res is None:
+                raise ServiceException(
+                    code=status.HTTP_204_NO_CONTENT,
+                )
+        except Exception as e:
+            raise ServiceException(
+                detail="already exists",
+                code=status.HTTP_409_CONFLICT,
+                log=str(e)
+            )
+        return RevisionShortInfo(
+            created_by=res.created_by,
+            passed=res.passed,
+            id=res.id,
+            text=res.text,
+        )
