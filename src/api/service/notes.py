@@ -25,7 +25,7 @@ class NotesService:
             user_id=created_by,
         )
         GetAllNotesResponse(
-            result=NoteShortInfo()
+            result=[self.__get_short_info(session, note) for note in notes]
         )
 
     async def __get_short_info(
