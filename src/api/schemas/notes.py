@@ -22,3 +22,7 @@ class NoteShortInfo(BaseModel):
     text: str
     created_at: datetime
     created_by: int
+
+
+class GetAllNotesResponse(BaseModel):
+    result: list[NoteShortInfo]
