@@ -16,7 +16,7 @@ class ServiceException(BaseException):
         if log:
             logger.error(log, code=code, detail=detail)
 
-        super(self).__init__(self.__detail)
+        super().__init__(self.__detail)
 
     @property
     def code(self) -> int:

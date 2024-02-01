@@ -9,19 +9,21 @@ from src.api.schemas.notes import (
     Note,
 )
 from src.core.models import db_helper
-from src.logger import logger
+from structlog import get_logger
 from .service_helper import service
 from ..exceptions import ServiceException
 
+logger = get_logger()
+
 router = APIRouter(
     tags=[
-        "Users",
+        "Notes",
     ],
     prefix="/notes"
 )
 
 
-@router.post("/")
+@router.post("/", status_code=status.HTTP_201_CREATED)
 async def create(
         token: str,
         request: NoteCreationRequest,
@@ -116,3 +118,20 @@ async def update_logic(
         session=session,
     )
 
+
+@router.delete("/{note_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete(
+        note_id: int,
+        token: str,
+        session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+) -> None:
+    try:
+        await service.notes.delete(note_id, token, session)
+    except ServiceException as e:
+        raise HTTPException(detail=e.detail, status_code=e.code)
+    except Exception as e:
+        logger.error(f"got unexpected trowed exception e={e}")
+        raise HTTPException(
+            detail="Internal server error",
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )

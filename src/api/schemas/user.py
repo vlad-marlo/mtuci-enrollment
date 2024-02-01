@@ -41,7 +41,7 @@ class GetManyUsersResponse(BaseModel):
 
 class UserRegisterRequest(BaseModel):
     phone: Annotated[str, MinLen(11), MaxLen(12)]
-    password: SecretStr
+    password: str
     first_name: str
     middle_name: str
     last_name: str

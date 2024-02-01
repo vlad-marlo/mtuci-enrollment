@@ -1,4 +1,4 @@
-from structlog import configure
+from structlog import configure, get_logger
 from structlog.processors import (
     JSONRenderer,
     add_log_level,
@@ -6,7 +6,6 @@ from structlog.processors import (
     StackInfoRenderer,
     TimeStamper,
 )
-
 
 configure(
     processors=[
@@ -17,8 +16,8 @@ configure(
         JSONRenderer(),
     ],
 )
-if __name__ == "__main__":
-    from structlog import get_logger
 
-    logger = get_logger()
+logger = get_logger()
+
+if __name__ == "__main__":
     logger.warning("hello")

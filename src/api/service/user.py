@@ -63,9 +63,9 @@ class UserService:
             session: AsyncSession,
     ) -> UserAuthorizedResponse | None:
         user_dict = user_data.model_dump()
-        user_dict["password"] = user_data.password.get_secret_value()
         user = DatabaseUser(**user_dict)
-        async with session.begin():
+        try:
+
             user = await self.__storage.user().create(
                 user,
                 session=session,
@@ -75,7 +75,10 @@ class UserService:
                 token,
                 session=session,
             )
-        return UserAuthorizedResponse(token=token.token)
+        except Exception as e:
+            raise ServiceException(log=e, detail="Internal error")
+        else:
+            return UserAuthorizedResponse(token=token.token)
 
     @staticmethod
     def __generate_token(user_id: int) -> Token:

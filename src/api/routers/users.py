@@ -10,6 +10,7 @@ from src.api.schemas import (
     UserAuthorizedResponse,
 )
 from src.core.models import db_helper
+from src.logger import logger
 from .service_helper import service
 
 router = APIRouter(
@@ -66,11 +67,15 @@ async def register_user(
 ) -> UserAuthorizedResponse:
     try:
         result = await service.user.register_user(data, session=session)
-        if result is None:
-            raise HTTPException(status_code=400, detail="something went wrong")
+
     except ServiceException as e:
         raise HTTPException(status_code=e.code, detail=e.detail)
-    return result
+    except Exception as e:
+        logger.error(f'{e}; result={data}')
+    else:
+        if result is None:
+            raise HTTPException(status_code=400, detail="something went wrong")
+        return result
 
 
 @router.post("/login")

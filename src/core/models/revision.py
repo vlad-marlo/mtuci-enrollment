@@ -30,5 +30,5 @@ class Revision(Base):
 
     user: Mapped["User"] = relationship(
         "User",
-        back_populates="revision",
+        back_populates="revisions",
     )

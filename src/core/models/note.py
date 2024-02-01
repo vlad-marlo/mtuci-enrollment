@@ -12,6 +12,7 @@ STATUS_APPROVED = 1
 
 if TYPE_CHECKING:
     from .revision import Revision
+    from .user import User
 
 
 class Note(Base):
@@ -27,8 +28,9 @@ class Note(Base):
         unique=False,
         nullable=False,
     )
+    user: Mapped["User"] = relationship(back_populates="notes")
 
-    revision: Mapped["Revision"] = relationship(back_populates="note")
+    revision: Mapped["Revision"] = relationship()
 
     def __str__(self) -> str:
         return (
