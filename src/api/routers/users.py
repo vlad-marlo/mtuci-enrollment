@@ -9,11 +9,8 @@ from src.api.schemas import (
     UserLoginRequest,
     UserAuthorizedResponse,
 )
-from src.api.service import Service
-from src.api.storage.sql import Storage
 from src.core.models import db_helper
-
-__service = Service(Storage())
+from .service_helper import service
 
 router = APIRouter(
     tags=[
@@ -34,10 +31,10 @@ async def get_users(
     back. If not exists or phone not provided
     """
     if phone is not None:
-        res = await __service.user.get_by_id(phone, session=session)
+        res = await service.user.get_by_id(phone, session=session)
         if res is not None:
             return User.model_validate(res)
-    res = await __service.user.get_all_users(session)
+    res = await service.user.get_all_users(session)
     return res
 
 
@@ -47,7 +44,7 @@ async def get_me(
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ) -> User:
     try:
-        user: User | None = await __service.user.get_by_token(
+        user: User | None = await service.user.get_by_token(
             token,
             session=session,
         )
@@ -68,7 +65,7 @@ async def register_user(
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ) -> UserAuthorizedResponse:
     try:
-        result = await __service.user.register_user(data, session=session)
+        result = await service.user.register_user(data, session=session)
         if result is None:
             raise HTTPException(status_code=400, detail="something went wrong")
     except ServiceException as e:
@@ -82,7 +79,7 @@ async def login_user(
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ) -> UserAuthorizedResponse:
     try:
-        result = await __service.user.login(data, session=session)
+        result = await service.user.login(data, session=session)
     except ServiceException as e:
         raise HTTPException(status_code=e.code, detail=e.detail)
     return result
@@ -95,7 +92,7 @@ async def get_user_by_id(
 ) -> User:
     """get user by provided id"""
 
-    user = await __service.user.get_by_id(user_id, session=session)
+    user = await service.user.get_by_id(user_id, session=session)
     if user:
         return user
     raise HTTPException(
