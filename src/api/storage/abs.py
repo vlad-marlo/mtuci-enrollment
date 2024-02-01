@@ -35,7 +35,22 @@ class BaseUserStorage(ABC):
         pass
 
     @abstractmethod
-    async def get_auth_data_by_phone(
+    async def get_user_by_phone(
+            self,
+            phone: str,
+            *,
+            session: AsyncSession,
+    ) -> User | None:
+        """
+        get_user_by_id
+
+        Returns user by provided id if it stored in and None object
+        if not, respectively.
+        """
+        pass
+
+    @abstractmethod
+    async def get_by_phone(
             self,
             phone: str,
             *,

@@ -27,6 +27,16 @@ class UserStorage(BaseUserStorage):
     ) -> User | None:
         return await session.get(User, user_id)
 
+    async def get_user_by_phone(
+            self,
+            phone: str,
+            *,
+            session: AsyncSession,
+    ) -> User | None:
+        stmt = select(User).where(User.phone == phone)
+        res = await session.scalars(stmt)
+        return res.one_or_none()
+
     async def get_users(
             self,
             *,

@@ -25,18 +25,41 @@ router = APIRouter(
 
 @router.get("/")
 async def get_users(
-        session: AsyncSession = Depends(db_helper.scoped_session_dependency)
+        session: AsyncSession = Depends(db_helper.scoped_session_dependency),
+        phone: str | None = None,
 ) -> GetManyUsersResponse:
-    """return all users"""
+    """
+    Get users.
+    If phone is provided and user exists in database, then it will be returned
+    back. If not exists or phone not provided
+    """
+    if phone is not None:
+        res = await __service.user.get_by_id(phone, session=session)
+        if res is not None:
+            return User.model_validate(res)
     res = await __service.user.get_all_users(session)
     return res
 
 
 @router.get("/me")
 async def get_me(
+        token: str,
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ) -> User:
-    pass
+    try:
+        user: User | None = await __service.user.get_by_token(
+            token,
+            session=session,
+        )
+    except ServiceException as e:
+        raise HTTPException(detail=e.detail, status_code=e.code)
+    else:
+        if user is None:
+            raise HTTPException(
+                detail="user not found",
+                status_code=status.HTTP_401_UNAUTHORIZED,
+            )
+        return user
 
 
 @router.post("/register")

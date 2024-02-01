@@ -44,6 +44,17 @@ class UserService:
         )
         return User.model_validate(user_from_db) if user_from_db else None
 
+    async def get_by_phone(
+            self,
+            phone: str,
+            session: AsyncSession,
+    ) -> User | None:
+        user_from_db = await self.__storage.user().get_by_phone(
+            phone,
+            session=session,
+        )
+        return User.model_validate(user_from_db) if user_from_db else None
+
     async def register_user(
             self,
             user_data: UserRegisterRequest,
@@ -95,3 +106,20 @@ class UserService:
         except Exception as e:
             raise ServiceException(log=f"unknown exception {e}")
         return UserAuthorizedResponse(token=token.token)
+
+    def get_by_token(self, token: str, session: AsyncSession) -> User | None:
+        try:
+            token_value: Token | None = self.__storage.token().get_by_token_value(
+                token,
+                session=session,
+            )
+            if token_value is None:
+                return None
+        except Exception as e:
+            raise ServiceException(
+                detail="unknown error",
+                log=str(e),
+                code=status.HTTP_401_UNAUTHORIZED
+            )
+        else:
+            return token_value.user
