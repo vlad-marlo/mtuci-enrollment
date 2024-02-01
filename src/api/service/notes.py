@@ -22,7 +22,7 @@ class NotesService:
             self,
             session: AsyncSession,
             created_by: int | None = None,
-            revision_passed: str | None = None,
+            revision_passed: bool | None = None,
     ) -> GetAllNotesResponse:
         notes = await self.__get_all_with_no_user_id(
             session=session,
@@ -32,8 +32,12 @@ class NotesService:
             revision_passed=revision_passed,
             user_id=created_by,
         )
-        GetAllNotesResponse(
-            result=[self.__get_full_info(session, note) for note in notes]
+        res = []
+        for note in notes:
+            info = await self.__get_full_info(session, note)
+            res.append(info)
+        return GetAllNotesResponse(
+            result=res
         )
 
     async def __get_full_info(
@@ -52,6 +56,7 @@ class NotesService:
             created_at=note.created_at,
             created_by=note.created_by,
             text=note.text,
+            revision=None
         )
 
         if revision is None:
@@ -62,13 +67,8 @@ class NotesService:
             passed=revision.passed,
             created_by=revision.created_by
         )
-        return Note(
-            id=note.id,
-            revision=revision_short,
-            created_by=note.created_by,
-            created_at=note.created_at,
-            text=note.text,
-        )
+        result.revision = revision_short
+        return result
 
     async def __get_all_with_user_id(
             self,

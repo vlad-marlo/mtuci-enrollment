@@ -38,7 +38,7 @@ class RevisionStorage(BaseRevisionsStorage):
     ) -> Revision | None:
         stmt = select(Revision).where(Revision.note_id == note_id)
         result = await session.execute(stmt)
-        return result.scalar_one_or_none()
+        return result.scalar()
 
     async def get_by_id(
             self,
