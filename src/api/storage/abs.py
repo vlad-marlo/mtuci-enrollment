@@ -182,12 +182,12 @@ class BaseRevisionsStorage(ABC):
         pass
 
     @abstractmethod
-    async def get_all_by_note_id(
+    async def get_by_note_id(
             self,
             note_id: int,
             *,
             session: AsyncSession,
-    ) -> list[Revision]:
+    ) -> Revision | None:
         pass
 
     @abstractmethod
