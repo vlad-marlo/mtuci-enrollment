@@ -44,7 +44,13 @@ async def register_user(
         data: UserRegisterRequest,
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ) -> UserAuthorizedResponse:
-    pass
+    try:
+        result = await __service.user.register_user(data, session=session)
+        if result is None:
+            raise HTTPException(status_code=400, detail="something went wrong")
+    except ServiceException as e:
+        raise HTTPException(status_code=e.code, detail=e.detail)
+    return result
 
 
 @router.post("/login")
@@ -52,7 +58,11 @@ async def login_user(
         data: UserLoginRequest,
         session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ) -> UserAuthorizedResponse:
-    pass
+    try:
+        result = await __service.user.login(data, session=session)
+    except ServiceException as e:
+        raise HTTPException(status_code=e.code, detail=e.detail)
+    return result
 
 
 @router.get("/{user_id}")
@@ -62,7 +72,7 @@ async def get_user_by_id(
 ) -> User:
     """get user by provided id"""
 
-    user = await service.user.get_by_id(user_id)
+    user = await __service.user.get_by_id(user_id, session=session)
     if user:
         return user
     raise HTTPException(
