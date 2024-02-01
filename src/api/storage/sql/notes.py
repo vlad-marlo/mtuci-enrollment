@@ -52,13 +52,11 @@ class NotesStorage(BaseNotesStorage):
         notes = result.scalars().all()
         return list(notes)
 
-    async def get_all_by_user_id_with_status(
+    async def get_all_by_user_id_and_passing(
             self,
             user_id: int,
-            status: int,
-            *,
+            passed: bool,
             session: AsyncSession,
-
     ) -> list[Note]:
         """
         return all notes, related to user with status.
@@ -70,8 +68,8 @@ class NotesStorage(BaseNotesStorage):
             .where(
                 and_(
                     Note.user_id == user_id,
-                    Note.status == status,
                     not Note.is_deleted,
+                    Note.revision.passed == passed,
                 ),
             ).order_by(desc(Note.created_at))
         )
@@ -97,3 +95,38 @@ class NotesStorage(BaseNotesStorage):
         )
         result = await self.__get_by_stmt(stmt, session=session)
         return result
+
+    async def get_all(self, session: AsyncSession) -> list[Note]:
+        stmt = (
+            select(Note)
+            .where(
+                not Note.is_deleted,
+
+            )
+            .order_by(desc(Note.created_at))
+        )
+        result = await self.__get_by_stmt(stmt, session=session)
+        return result
+
+    async def get_all_with_revisions(self, session: AsyncSession):
+        pass
+
+    async def get_all_by_revision_passing(
+            self,
+            session: AsyncSession,
+            revision_passed: bool,
+    ) -> list[Note]:
+        pass
+
+    async def get_all_with_no_revisions(
+            self,
+            session: AsyncSession,
+    ) -> list[Note]:
+        pass
+
+    async def get_all_by_user_with_any_revisions(
+            self,
+            session: AsyncSession,
+            user_id: int
+    ) -> list[Note]:
+        pass

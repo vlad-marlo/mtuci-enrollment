@@ -2,6 +2,8 @@ from datetime import datetime
 
 from pydantic import BaseModel
 
+from src.api.schemas.revision import RevisionShortInfo
+
 
 class Note(BaseModel):
     id: int
@@ -22,6 +24,7 @@ class NoteShortInfo(BaseModel):
     text: str
     created_at: datetime
     created_by: int
+    revision: RevisionShortInfo | None = None
 
 
 class GetAllNotesResponse(BaseModel):
