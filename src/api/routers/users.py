@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.api.exceptions import ServiceException
 from src.api.schemas import (
     GetManyUsersResponse,
     User,
@@ -10,9 +12,8 @@ from src.api.schemas import (
 from src.api.service import Service
 from src.api.storage.sql import Storage
 from src.core.models import db_helper
-from .service_helper import get_service
 
-s = Service(Storage(db_helper.get_scoped_session()))
+__service = Service(Storage())
 
 router = APIRouter(
     tags=[
@@ -24,16 +25,16 @@ router = APIRouter(
 
 @router.get("/")
 async def get_users(
-        service: Service = Depends(get_service)
+        session: AsyncSession = Depends(db_helper.scoped_session_dependency)
 ) -> GetManyUsersResponse:
     """return all users"""
-    res = await service.user.get_all_users()
+    res = await __service.user.get_all_users(session)
     return res
 
 
 @router.get("/me")
 async def get_me(
-        service: Service = Depends(get_service),
+        session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ) -> User:
     pass
 
@@ -41,7 +42,7 @@ async def get_me(
 @router.post("/register")
 async def register_user(
         data: UserRegisterRequest,
-        service: Service = Depends(get_service),
+        session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ) -> UserAuthorizedResponse:
     pass
 
@@ -49,7 +50,7 @@ async def register_user(
 @router.post("/login")
 async def login_user(
         data: UserLoginRequest,
-        service: Service = Depends(get_service),
+        session: AsyncSession = Depends(db_helper.scoped_session_dependency),
 ) -> UserAuthorizedResponse:
     pass
 
@@ -57,7 +58,7 @@ async def login_user(
 @router.get("/{user_id}")
 async def get_user_by_id(
         user_id: int,
-        service: Service = Depends(get_service)
+        session: AsyncSession = Depends(db_helper.scoped_session_dependency)
 ) -> User:
     """get user by provided id"""
 
