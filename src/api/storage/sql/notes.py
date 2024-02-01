@@ -145,3 +145,10 @@ class NotesStorage(BaseNotesStorage):
             .order_by(desc(Note.created_at))
         )
         return await self.__get_by_stmt(stmt, session=session)
+
+    async def get_by_id(
+            self,
+            session: AsyncSession,
+            note_id: int,
+    ) -> Note | None:
+        return await session.get(Note, note_id)

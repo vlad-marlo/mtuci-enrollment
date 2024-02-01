@@ -10,7 +10,7 @@ from src.api.schemas.notes import (
 from src.api.schemas.revision import RevisionShortInfo
 from src.api.service.token import TokenService
 from src.api.storage import BaseStorage
-from src.core.models import Note, Revision
+from src.core.models import Note as DBNote, Revision
 
 
 class NotesService:
@@ -33,13 +33,13 @@ class NotesService:
             user_id=created_by,
         )
         GetAllNotesResponse(
-            result=[self.__get_short_info(session, note) for note in notes]
+            result=[self.__get_full_info(session, note) for note in notes]
         )
 
-    async def __get_short_info(
+    async def __get_full_info(
             self,
             session: AsyncSession,
-            note: Note,
+            note: DBNote,
     ) -> Note:
         revision: Revision | None = await (
             self.__storage.revision().get_by_note_id(
@@ -75,7 +75,7 @@ class NotesService:
             session: AsyncSession,
             user_id: int,
             revision_passed: str | None = None,
-    ) -> list[Note]:
+    ) -> list[DBNote]:
         if revision_passed is None:
             return await self.__storage.note().get_all_by_user_id(
                 user_id,
@@ -91,7 +91,7 @@ class NotesService:
             self,
             session: AsyncSession,
             revision_passed: bool | None = None,
-    ) -> list[Note]:
+    ) -> list[DBNote]:
         if revision_passed is None:
             return await self.__storage.note().get_all(session)
         return await self.__get_all_with_no_user_and_revision(
@@ -103,7 +103,7 @@ class NotesService:
             self,
             session: AsyncSession,
             revision_passed: bool | None = None,
-    ) -> list[Note]:
+    ) -> list[DBNote]:
         return await self.__storage.note().get_all_by_revision_passing(
             session,
             revision_passed,
@@ -114,7 +114,7 @@ class NotesService:
             session: AsyncSession,
             user_id: int,
             revision_passed: None | bool,
-    ) -> list[Note]:
+    ) -> list[DBNote]:
         if revision_passed is None:
             return await (
                 self.__storage.note().
@@ -141,7 +141,7 @@ class NotesService:
                 detail="unauthorized",
                 code=status.HTTP_401_UNAUTHORIZED,
             )
-        note = Note(
+        note = DBNote(
             text=text,
             is_deleted=False,
             created_by=user_id,
@@ -158,3 +158,12 @@ class NotesService:
                 id=note.id,
                 text=note.text,
             )
+
+    async def get_by_id(self, note_id: int, session: AsyncSession) -> Note:
+        note = await self.__storage.note().get_by_id(session, note_id)
+        if note is None:
+            raise ServiceException(
+                detail="not found",
+                code=status.HTTP_404_NOT_FOUND,
+            )
+        return await self.__get_full_info(session, note)

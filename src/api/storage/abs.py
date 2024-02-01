@@ -142,6 +142,14 @@ class BaseNotesStorage(ABC):
     ) -> list[Note]:
         pass
 
+    @abstractmethod
+    async def get_by_id(
+            self,
+            session: AsyncSession,
+            note_id: int,
+    ) -> Note | None:
+        pass
+
 
 class BaseRevisionsStorage(ABC):
     """BaseRevisionsStorage is interface of store, which provide all
