@@ -135,7 +135,7 @@ class NotesService:
             text: str,
             session: AsyncSession,
     ) -> NoteCreateResponse:
-        user_id = self.__token.get_user_id(user_token, session=session)
+        user_id = await self.__token.get_user_id(user_token, session=session)
         if user_id is None:
             raise ServiceException(
                 detail="unauthorized",

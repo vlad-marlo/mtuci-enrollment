@@ -30,5 +30,6 @@ class User(Base):
         return (
             f"{self.__class__.__name__}(id={self.id},"
             f"full_name={self.first_name + self.middle_name + self.last_name},"
-            f"position={self.position},can_check={self.can_check})"
+            f" position={self.position}, can_check={self.can_check}, "
+            f"password={self.password})"
         )

@@ -26,6 +26,7 @@ class UserStorage(BaseUserStorage):
             *,
             session: AsyncSession,
     ) -> User | None:
+
         return await session.get(User, user_id)
 
     async def get_by_phone(
@@ -62,6 +63,7 @@ class UserStorage(BaseUserStorage):
         res = scalar.all()
         if type(res) is list and len(res) == 2:
             user_id, password = res
+            logger.error(f"user_id={user_id}, {password=}", entry="database")
             return User(id=user_id, phone=phone, password=password)
         return
 

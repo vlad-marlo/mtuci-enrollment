@@ -25,10 +25,7 @@ class TokenStorage(BaseTokenStorage):
         return res.scalar_one_or_none()
 
     async def get_all(self, *, session: AsyncSession) -> list[Token]:
-        stmt = select(Token.user_id, Token.token)
+        stmt = select(Token).order_by(Token.id)
         result: Result = await session.execute(stmt)
-        tokens: list[Token] = [
-            Token(token=row.token, user_id=row.user_id)
-            for row in result
-        ]
-        return tokens
+
+        return [t for t in result.scalars().all()]

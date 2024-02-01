@@ -1,7 +1,7 @@
 import random
 import string
 
-from fastapi import status
+from fastapi import status, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.exceptions import ServiceException
@@ -16,6 +16,7 @@ from src.api.service.token import TokenService
 from src.api.storage import BaseStorage
 from src.core.models import Token
 from src.core.models.user import User as DatabaseUser
+from src.logger import logger
 
 
 class UserService:
@@ -63,7 +64,10 @@ class UserService:
             session: AsyncSession,
     ) -> UserAuthorizedResponse | None:
         user_dict = user_data.model_dump()
+        logger.info(f"user_dict={user_dict}")
         user = DatabaseUser(**user_dict)
+        logger.info(f"user={user}")
+
         try:
 
             user = await self.__storage.user().create(
@@ -82,7 +86,12 @@ class UserService:
 
     @staticmethod
     def __generate_token(user_id: int) -> Token:
-        token = random.choices(string.printable, k=20)
+        token = ''.join(
+            random.choices(
+                string.ascii_letters + string.digits,
+                k=20,
+            ),
+        )
         return Token(user_id=user_id, token=token)
 
     async def login(
@@ -113,24 +122,29 @@ class UserService:
             raise ServiceException(log=f"unknown exception {e}")
         return UserAuthorizedResponse(token=token.token)
 
-    def get_by_token(self, token: str, session: AsyncSession) -> User:
+    async def get_by_token(self, token: str, session: AsyncSession) -> User:
         unauthorized = ServiceException(
             detail="unauthorized",
             code=status.HTTP_401_UNAUTHORIZED
         )
 
-        user_id = self.__tokens.get_user_id(token, session)
+        user_id: int | None = await self.__tokens.get_user_id(token, session)
         if user_id is None:
             raise unauthorized
         try:
-            user = self.__storage.user().get_user_by_id(token, session=session)
-        except Exception as e:
-            raise ServiceException(
-                detail="unknown error",
-                log=str(e),
-                code=status.HTTP_401_UNAUTHORIZED
+            user = await self.__storage.user().get_user_by_id(
+                user_id,
+                session=session,
             )
-        else:
             if user is None:
                 raise unauthorized
+        except ServiceException as e:
+            raise HTTPException(detail=e.detail, status_code=e.code)
+        except Exception as e:
+            logger.error(f"got unexpected exception {e=}")
+            raise HTTPException(
+                detail="unknown error",
+                status_code=status.HTTP_401_UNAUTHORIZED,
+            )
+        else:
             return user

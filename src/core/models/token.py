@@ -24,3 +24,6 @@ class Token(Base):
         "User",
         back_populates="tokens"
     )
+
+    def __str__(self):
+        return f"Token(id={self.id}, token={self.token})"
