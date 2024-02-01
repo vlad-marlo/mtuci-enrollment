@@ -146,7 +146,7 @@ class BaseRevisionsStorage(ABC):
 
 class BaseTokenStorage(ABC):
     @abstractmethod
-    async def create(self, user_id: Token, *, session: AsyncSession) -> Token:
+    async def create(self, token: Token, *, session: AsyncSession) -> Token:
         pass
 
     @abstractmethod
