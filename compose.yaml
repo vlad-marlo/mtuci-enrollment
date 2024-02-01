@@ -1,0 +1,41 @@
+services:
+  server:
+    image: vladmarlo/enrollment_backend:latest
+    ports:
+      - 8080:8080
+    restart: always
+    environment:
+      - DB_NAME=enrollment
+      - DB_HOST=db
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+  migrate:
+    image: vladmarlo/enrollment_migrator
+    restart: no
+    environment:
+      - DB_HOST=db
+      - DB_NAME=enrollment
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: postgres
+    restart: always
+    user: postgres
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=enrollment
+      - POSTGRES_PASSWORD=postgres
+    expose:
+      - 5432
+    healthcheck:
+      test: [ "CMD", "pg_isready" ]
+      interval: 1s
+      timeout: 1s
+      retries: 50
+volumes:
+  db-data:
