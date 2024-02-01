@@ -37,6 +37,22 @@ class UserStorage(BaseUserStorage):
         users: list[User] = [u for u in result.scalars().all()]
         return users
 
+    async def get_auth_data_by_phone(
+            self,
+            phone: str,
+            *,
+            session: AsyncSession,
+    ) -> User | None:
+        stmt = (
+            select(User.id, User.password).
+            where(User.phone == phone)
+        )
+        scalar = await session.scalars(stmt)
+        res = scalar.one_or_none()
+        if res:
+            return User(id=res.id, password=res.password, phone=phone)
+        return
+
     async def can_check(
             self,
             user_id: int,
