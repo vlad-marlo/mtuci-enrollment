@@ -116,17 +116,32 @@ class NotesStorage(BaseNotesStorage):
             session: AsyncSession,
             revision_passed: bool,
     ) -> list[Note]:
-        pass
+        stmt = (
+            select(Note)
+            .where(Note.revision.passed == revision_passed)
+            .order_by(desc(Note.created_at))
+        )
+        return await self.__get_by_stmt(stmt, session=session)
 
     async def get_all_with_no_revisions(
             self,
             session: AsyncSession,
     ) -> list[Note]:
-        pass
+        stmt = (
+            select(Note)
+            .where(Note.revision is None)
+            .order_by(desc(Note.created_at))
+        )
+        return await self.__get_by_stmt(stmt, session=session)
 
     async def get_all_by_user_with_any_revisions(
             self,
             session: AsyncSession,
             user_id: int
     ) -> list[Note]:
-        pass
+        stmt = (
+            select(Note)
+            .where(Note.revision is not None)
+            .order_by(desc(Note.created_at))
+        )
+        return await self.__get_by_stmt(stmt, session=session)

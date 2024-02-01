@@ -127,22 +127,10 @@ class BaseNotesStorage(ABC):
         pass
 
     @abstractmethod
-    async def get_all_with_revisions(self, session: AsyncSession) -> list[
-        Note]:
-        pass
-
-    @abstractmethod
     async def get_all_by_revision_passing(
             self,
             session: AsyncSession,
             revision_passed: bool,
-    ) -> list[Note]:
-        pass
-
-    @abstractmethod
-    async def get_all_with_no_revisions(
-            self,
-            session: AsyncSession,
     ) -> list[Note]:
         pass
 
@@ -152,10 +140,6 @@ class BaseNotesStorage(ABC):
             session: AsyncSession,
             user_id: int
     ) -> list[Note]:
-        pass
-
-    @abstractmethod
-    async def get_all_with_user_and_no_revisions(self, session: AsyncSession):
         pass
 
 
