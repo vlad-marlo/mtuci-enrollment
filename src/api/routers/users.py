@@ -32,7 +32,7 @@ async def get_users(
     back. If not exists or phone not provided
     """
     if phone is not None:
-        res = await service.user.get_by_id(phone, session=session)
+        res = await service.user.get_by_phone(phone, session=session)
         if res is not None:
             return User.model_validate(res)
     res = await service.user.get_all_users(session)

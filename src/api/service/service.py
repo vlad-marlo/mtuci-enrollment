@@ -13,7 +13,7 @@ class Service:
         token_service = TokenService(storage)
         self.__storage = storage
         self.__notes = NotesService(storage, token_service)
-        self.__revision = RevisionService(storage)
+        self.__revision = RevisionService(storage, token_service)
         self.__user = UserService(storage, token_service)
         self.__token = token_service
 

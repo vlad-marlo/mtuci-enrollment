@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.storage import BaseUserStorage
 from src.core.models import User
+from src.logger import logger
 
 
 class UserStorage(BaseUserStorage):
@@ -58,10 +59,12 @@ class UserStorage(BaseUserStorage):
             where(User.phone == phone)
         )
         scalar = await session.scalars(stmt)
-        res = scalar.one_or_none()
-        if res:
-            return User(id=res.id, password=res.password, phone=phone)
+        res = scalar.all()
+        if type(res) is list and len(res) == 2:
+            user_id, password = res
+            return User(id=user_id, phone=phone, password=password)
         return
+
 
     async def can_check(
             self,

@@ -6,3 +6,8 @@ class RevisionShortInfo(BaseModel):
     text: str
     created_by: int
     passed: bool
+
+
+class RevisionCreateRequest(BaseModel):
+    text: str
+    passed: bool
